@@ -1,0 +1,12 @@
+---
+title: " Reproducible Research on Strom Data "
+author: "Kunal Malhotra"
+date: "26/08/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
