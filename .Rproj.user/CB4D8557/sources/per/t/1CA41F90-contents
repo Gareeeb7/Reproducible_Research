@@ -1,0 +1,104 @@
+---
+title: ' Reproducible Research on Strom Data '
+author: "Kunal Malhotra"
+date: "26/08/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<h3>Data Prepocessing & Importing required packages</h3>
+
+<p>Download The Dataset from the link https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2</p>
+<p>Extract the stromData file from the downloaded Zip file.</p>
+<p>Import data into into R Studio.</p>
+<p>Import the required Packages to performe Analysis.</p>
+<p>convert PROPDMG and CROPDMG from units to numbers ()</p>
+<p>omit variables PROPDMGEXP and CROPDMGEXP</p>
+<p>restructure data to have tidy dataset with only 3 variables</p>
+
+```{r load-packages, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+```
+
+```{r, results="hide"}
+data = read.table(file = "C:/Users/user/Desktop/R_files/StormData.csv", header=T, sep = ",")
+```
+<p>Preview of Dataset</p>
+```{r}
+head(data)
+```
+<p>Summary of Dataset</p>
+```{r}
+summary(data)
+```
+<p>Extracting the EVTYPE, FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG variables from Data.</p>
+```{r}
+data <- data[ , c(8, 23:28)]
+head(data)
+```
+<p> Extracting CROPDMGEXP variable from dataset</P>
+```{r}
+table(data$CROPDMGEXP)
+```
+<p> Extracting PROPDMGEXP variable from dataset</P>
+```{r}
+table(data$PROPDMGEXP)
+```
+
+```{r, results="hide"}
+data<-data %>% 
+  mutate(CROPDMG = CROPDMG *case_when(
+    CROPDMGEXP == "B" ~ 10^9,
+    CROPDMGEXP == "k" | CROPDMGEXP == "K" ~ 10^3,
+    CROPDMGEXP == "m" | CROPDMGEXP == "M" ~ 10^6,
+    CROPDMGEXP == 2 ~ 2,
+    TRUE ~ 0
+  ), CROPDMGEXP=NULL
+  )
+
+data<-data %>% 
+  mutate(PROPDMG = PROPDMG *case_when(
+    PROPDMGEXP == "B" ~ 10^9,
+    PROPDMGEXP == "k" | PROPDMGEXP == "K" ~ 10^3,
+    PROPDMGEXP == "m" | PROPDMGEXP == "M" ~ 10^6,
+    PROPDMGEXP == "h" | PROPDMGEXP == "H" ~ 10^2,
+    PROPDMGEXP == 1 ~ 1,
+    PROPDMGEXP == 2 ~ 2,
+    PROPDMGEXP == 3 ~ 3,
+    PROPDMGEXP == 4 ~ 4,
+    PROPDMGEXP == 5 ~ 5,
+    PROPDMGEXP == 6 ~ 6,
+    PROPDMGEXP == 7 ~ 7,
+    PROPDMGEXP == 8 ~ 8,
+    TRUE ~ 0
+  ), PROPDMGEXP=NULL
+  )
+
+data <- melt(data, id=c('EVTYPE'), variable.name = "category", value.name = "value",na.rm = TRUE)
+```
+
+<h1>Analsys</h1>
+```{r}
+health <- aggregate(value ~ EVTYPE, data[data$category %in% c("FATALITIES","INJURIES"),], sum)
+health<-health[order(-health$value),][1:10,]
+
+barplot(health$value,names.arg=health$EVTYPE,las=2,col="steelblue", ylab="Damage", main="Top 10 storm event types harmful to population health")
+```
+
+```{r}
+  eco <- aggregate(value ~ EVTYPE + category, data[data$category %in% c("PROPDMG","CROPDMG"),], sum)
+  eco<-eco[order(-eco$value),][1:20,]
+  
+  ggplot(eco, aes(EVTYPE, value/1000000000,colour=factor(category))) + 
+    geom_bar(stat="identity") + 
+    facet_grid(category ~ .) +
+    labs(title = "Top 20 storm events with greatest economic consequences", y = "Damage (bn)") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
