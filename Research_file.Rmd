@@ -1,16 +1,24 @@
 ---
+<<<<<<< HEAD
 title: ' Reproducible Research on Strom Data '
 author: "Kunal Malhotra"
 date: "26/08/2020"
 output:
   pdf_document: default
   html_document: default
+=======
+title: " Reproducible Research on Strom Data "
+author: "Kunal Malhotra"
+date: "26/08/2020"
+output: html_document
+>>>>>>> 8896fbe548720697528728dfce25cd3024b21afd
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+<<<<<<< HEAD
 <h3>Data Prepocessing & Importing required packages</h3>
 
 <p>Download The Dataset from the link https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2</p>
@@ -102,3 +110,6 @@ barplot(health$value,names.arg=health$EVTYPE,las=2,col="steelblue", ylab="Damage
     labs(title = "Top 20 storm events with greatest economic consequences", y = "Damage (bn)") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
+=======
+
+>>>>>>> 8896fbe548720697528728dfce25cd3024b21afd

@@ -1,1 +1,0 @@
-# Reproducible_Research_Analysis_On_Strom_Data
